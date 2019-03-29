@@ -5,10 +5,12 @@ module.exports = config => {
     config = {}
   }
 
-  if (!config.rasa_uri) {
+  if (!config.rasa_uri) {    
     config.rasa_uri = 'http://localhost:5000'
   }
-
+  const instance = axios.create({
+    baseURL: config.rasa_uri
+  })
 
 
   var middleware = {
@@ -21,17 +23,16 @@ module.exports = config => {
       debug('Sending message to Rasa', message.text)
       var request={
         method: 'get',
-        url: `${config.rasa_uri}/parse`,
         params: {
           q: message.text
         }
       };
-      if (config.project) {
+      
+      if(config.project && config.model){
+        request.url="/parse"  
         request.params.project=config.project;
-      };
-      if (config.model) {
         request.params.model=config.model;
-      };
+      }
       axios(request).then(function (response) {
           debug('Rasa response', response);
           message.intent = response.data.intent;
