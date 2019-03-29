@@ -8,7 +8,7 @@ module.exports = config => {
   if (!config.rasa_uri) {    
     config.rasa_uri = 'http://localhost:5000'
   }
-  const instance = axios.create({
+  const rasa = axios.create({
     baseURL: config.rasa_uri
   })
 
@@ -33,7 +33,7 @@ module.exports = config => {
         request.params.project=config.project;
         request.params.model=config.model;
       }
-      axios(request).then(function (response) {
+      rasa(request).then(function (response) {
           debug('Rasa response', response);
           message.intent = response.data.intent;
           message.entities = response.data.entities;
