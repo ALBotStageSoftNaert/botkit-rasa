@@ -1,6 +1,5 @@
-const request = require('request-promise')
 const debug = require('debug')('botkit:rasa')
-
+const axios = require('axios');
 module.exports = config => {
   if (!config) {
     config = {}
@@ -10,6 +9,8 @@ module.exports = config => {
     config.rasa_uri = 'http://localhost:5000'
   }
 
+
+
   var middleware = {
     receive: (bot, message, next) => {
       if (!message.text || message.is_echo) {
@@ -18,21 +19,28 @@ module.exports = config => {
       }
 
       debug('Sending message to Rasa', message.text)
-      const options = {
-        method: 'POST',
-        uri: `${config.rasa_uri}/parse`,
-        body: {
+      var request={
+        method: 'get',
+        url: `${config.rasa_uri}/parse`,
+        params: {
           q: message.text
-        },
-        json: true
+        }
+      };
+      if (config.project) {
+        request.params.project=config.project;
       }
-
-      request(options)
-        .then(response => {
+      if (config.model) {
+        request.params.model=config.model;
+      }
+      axios(request)
+        .then(function (response) {
           debug('Rasa response', response)
-          message.intent = response.intent
-          message.entities = response.entities
+          message.intent = response.data.intent
+          message.entities = response.data.entities
           next()
+        })
+        .catch(function (err) {
+          debug("Couldn't retrieve response from rasa. Check if your url, project and model are set correctly.",err);
         })
     },
 
