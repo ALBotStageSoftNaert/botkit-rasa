@@ -28,18 +28,16 @@ module.exports = config => {
       };
       if (config.project) {
         request.params.project=config.project;
-      }
+      };
       if (config.model) {
         request.params.model=config.model;
-      }
-      axios(request)
-        .then(function (response) {
-          debug('Rasa response', response)
-          message.intent = response.data.intent
-          message.entities = response.data.entities
-          next()
-        })
-        .catch(function (err) {
+      };
+      axios(request).then(function (response) {
+          debug('Rasa response', response);
+          message.intent = response.data.intent;
+          message.entities = response.data.entities;
+          next();
+        }).catch(function (err) {
           debug("Couldn't retrieve response from rasa. Check if your url, project and model are set correctly.",err);
         })
     },
